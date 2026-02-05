@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
+import * as os from 'os';
 import simpleGit, { SimpleGit } from 'simple-git';
 import { SyncConfig, SyncResult, SyncHistoryEntry } from './types';
 
@@ -31,33 +32,53 @@ export class SyncManager {
     let tempDir: string | undefined;
 
     try {
+      // Validate configuration
+      if (!config.gitRepo || config.gitRepo.trim() === '') {
+        throw new Error('Git repository URL is not configured. Please set cursorSync.gitRepo in settings.');
+      }
+
       // Get workspace folder
       const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
       if (!workspaceFolder) {
         throw new Error('No workspace folder opened');
       }
 
-      // Create temporary directory
-      tempDir = path.join(workspaceFolder.uri.fsPath, `.cursor-sync-${Date.now()}`);
+      // Create temporary directory in system temp folder with random suffix
+      const randomSuffix = Math.random().toString(36).substring(2, 15);
+      tempDir = path.join(os.tmpdir(), `cursor-sync-${Date.now()}-${randomSuffix}`);
       fs.mkdirSync(tempDir, { recursive: true });
 
       // Clone repository with shallow clone
-      await this.git.clone(config.gitRepo, tempDir, [
-        '--depth=1',
-        `-b`,
-        config.branch,
-        '--single-branch'
-      ]);
+      try {
+        await this.git.clone(config.gitRepo, tempDir, [
+          '--depth=1',
+          `-b`,
+          config.branch,
+          '--single-branch'
+        ]);
+      } catch (gitError: any) {
+        throw new Error(
+          `Failed to clone repository: ${gitError.message}\n\n` +
+          'Please check:\n' +
+          '1. Git is installed on your system\n' +
+          '2. Repository URL is correct\n' +
+          '3. You have access to the repository\n' +
+          '4. Network connection is stable'
+        );
+      }
 
       // Resolve remote path
       const remotePath = path.join(tempDir, config.remotePath);
       if (!fs.existsSync(remotePath)) {
-        throw new Error(`Remote path does not exist: ${config.remotePath}`);
+        throw new Error(
+          `Remote path "${config.remotePath}" does not exist in repository.\n\n` +
+          'Please check the cursorSync.remotePath setting.'
+        );
       }
 
       // Resolve local path
       const localPath = path.join(workspaceFolder.uri.fsPath, config.localPath);
-      
+
       // Ensure local directory exists
       if (!fs.existsSync(localPath)) {
         fs.mkdirSync(localPath, { recursive: true });
@@ -167,7 +188,7 @@ export class SyncManager {
    */
   private async saveHistory(result: SyncResult): Promise<void> {
     const history = this.getHistory();
-    
+
     // Add new entry
     history.unshift({
       timestamp: result.timestamp,

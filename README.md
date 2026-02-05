@@ -15,6 +15,28 @@
 - 🔔 **智能提醒**: 启动时智能提示同步，可配置关闭
 - 🚀 **快捷操作**: 命令面板和快捷菜单，操作便捷
 
+## 📋 系统要求
+
+在安装和使用本扩展之前，请确保满足以下要求：
+
+### 必需条件
+
+- **Git**: 必须在系统中安装 Git 命令行工具
+  - Windows: [下载 Git for Windows](https://git-scm.com/download/win)
+  - macOS: 通常已预装，或运行 `xcode-select --install`
+  - Linux: `sudo apt-get install git` 或 `sudo yum install git`
+  - 验证安装: 运行 `git --version` 确认
+
+- **Git 仓库**: 需要一个包含 Cursor 命令文件的 Git 仓库
+  - 可以是公开仓库或私有仓库
+  - 仓库中应包含您的自定义命令文件
+  - 示例结构: `your-repo/cursor/commands/*.md`
+
+### 推荐环境
+
+- VSCode 或 Cursor 版本: 1.80.0 或更高
+- 稳定的网络连接（用于克隆 Git 仓库）
+
 ## 📦 安装
 
 ### 方式一：从 VSCode Marketplace 安装
@@ -75,7 +97,7 @@
 
 | 配置项 | 类型 | 默认值 | 说明 |
 |--------|------|--------|------|
-| `cursorSync.gitRepo` | string | `https://github.com/ApolloNaco/AITools.git` | Git 仓库地址 |
+| `cursorSync.gitRepo` | string | `""` | Git 仓库地址（必填：配置你自己的仓库） |
 | `cursorSync.remotePath` | string | `cursor/commands` | 仓库中的远程路径 |
 | `cursorSync.localPath` | string | `.cursor/commands` | 本地同步路径（相对于工作区） |
 | `cursorSync.branch` | string | `master` | Git 分支名称 |

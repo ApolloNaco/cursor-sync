@@ -6,21 +6,34 @@
   "publisher": "Genyuan",
   "author": {
     "name": "Genyuan",
-    "url": "https://juejin.cn/user/Genyuan的AI工程"
+    "url": "https://github.com/ApolloNaco"
   },
   "engines": {
     "vscode": "^1.80.0"
   },
+  "icon": "icon.png",
   "categories": [
-    "Other"
+    "Other",
+    "Productivity"
   ],
   "keywords": [
     "cursor",
     "sync",
     "commands",
     "git",
-    "ai"
+    "ai",
+    "automation",
+    "workspace",
+    "configuration"
   ],
+  "homepage": "https://github.com/ApolloNaco/cursor-sync#readme",
+  "bugs": {
+    "url": "https://github.com/ApolloNaco/cursor-sync/issues"
+  },
+  "galleryBanner": {
+    "color": "#0078D7",
+    "theme": "dark"
+  },
   "activationEvents": [
     "onStartupFinished"
   ],
@@ -69,8 +82,8 @@
         },
         "cursorSync.gitRepo": {
           "type": "string",
-          "default": "https://github.com/ApolloNaco/AITools.git",
-          "description": "Git repository URL"
+          "default": "",
+          "description": "Git repository URL (required: configure your own repository)"
         },
         "cursorSync.remotePath": {
           "type": "string",
@@ -96,7 +109,9 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile",
     "test": "node ./out/test/runTest.js",
-    "package": "vsce package"
+    "package": "vsce package",
+    "publish:ovsx": "ovsx publish -p $OVSX_TOKEN",
+    "publish": "bash scripts/publish.sh"
   },
   "dependencies": {
     "simple-git": "^3.19.0"
